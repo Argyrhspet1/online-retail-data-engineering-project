@@ -40,5 +40,4 @@ GO
 TRUNCATE TABLE Silver_OnlineRetail;
 GO
 
-SELECT *
-FROM Silver_OnlineRetail
+α
