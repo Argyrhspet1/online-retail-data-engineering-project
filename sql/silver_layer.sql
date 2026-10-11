@@ -35,5 +35,10 @@ SELECT
 FROM Bronze_OnlineRetail;
 GO
 
+
+
+TRUNCATE TABLE Silver_OnlineRetail;
+GO
+
 SELECT *
 FROM Silver_OnlineRetail
