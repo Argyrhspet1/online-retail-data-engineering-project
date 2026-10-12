@@ -1,43 +1,64 @@
 USE OnlineRetailDW;
 GO
 
-CREATE TABLE Silver_OnlineRetail(
-	InvoiceNo VARCHAR(50),
-    StockCode VARCHAR(50),
-    Description VARCHAR(255),
-    Quantity INT,
-    InvoiceDate DATETIME,
-    UnitPrice DECIMAL(10, 2),
-    CustomerID VARCHAR(50),
-    Country VARCHAR(100)
-);
+IF OBJECT_ID('sp_LoadSilverLayer', 'P') IS NOT NULL
+    DROP PROCEDURE sp_LoadSilverLayer
 GO
 
-INSERT INTO Silver_OnlineRetail(
-        InvoiceNo,
-        StockCode,
-        Description,
-        Quantity,
-        InvoiceDate,
-        UnitPrice,
-        CustomerID,
-        Country
-)
-SELECT
-    InvoiceNO,
-    StockCode,
-    Description,
-    TRY_CAST(Quantity AS INT) AS Quantity,
-    TRY_CAST(InvoiceDate AS DATETIME) AS InvoiceDate,
-    TRY_CAST(UnitPrice AS DECIMAL(10,2)) AS UnitPrice,
-    CustomerID,
-    Country
-FROM Bronze_OnlineRetail;
+CREATE PROCEDURE sp_LoadSilverLayer
+AS
+BEGIN
+    BEGIN TRANSACTION
+        BEGIN TRY
+            
+            IF OBJECT_ID('Silver_OnlineRetail','U') IS NOT NULL 
+                DROP TABLE Silver_OnlineRetail
+
+            CREATE TABLE Silver_OnlineRetail(
+	            InvoiceNo VARCHAR(50),
+                StockCode VARCHAR(50),
+                Description VARCHAR(255),
+                Quantity INT,
+                InvoiceDate DATETIME,
+                UnitPrice DECIMAL(10, 2),
+                CustomerID VARCHAR(50),
+                Country VARCHAR(100)
+            );
+            
+
+            INSERT INTO Silver_OnlineRetail(
+                    InvoiceNo,
+                    StockCode,
+                    Description,
+                    Quantity,
+                    InvoiceDate,
+                    UnitPrice,
+                    CustomerID,
+                    Country
+            )
+            SELECT
+                InvoiceNO,
+                StockCode,
+                Description,
+                TRY_CAST(Quantity AS INT) AS Quantity,
+                TRY_CAST(InvoiceDate AS DATETIME) AS InvoiceDate,
+                TRY_CAST(UnitPrice AS DECIMAL(10,2)) AS UnitPrice,
+                CustomerID,
+                Country
+            FROM Bronze_OnlineRetail;
+            
+            COMMIT
+        END TRY
+        BEGIN CATCH
+            ROLLBACK TRANSACTION
+
+            PRINT 'Error in Loading Silver Layer'
+            PRINT ERROR_MESSAGE();
+        END CATCH
+END
 GO
 
+EXEC sp_LoadSilverLayer
 
 
-TRUNCATE TABLE Silver_OnlineRetail;
-GO
 
-α
