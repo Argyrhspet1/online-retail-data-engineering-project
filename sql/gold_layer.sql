@@ -38,11 +38,6 @@ BEGIN
 			GROUP BY CustomerID;
 			
 
-
-
-		
-			
-
 			CREATE TABLE Gold_DimProduct(
 				ProductKey INT IDENTITY(1,1) PRIMARY KEY,
 				StockCode VARCHAR(50) UNIQUE,
@@ -95,4 +90,6 @@ BEGIN
 END
 GO
 
-EXEC sp_LoadGoldLayer
+EXEC sp_LoadGoldLayer;
+GO
+
