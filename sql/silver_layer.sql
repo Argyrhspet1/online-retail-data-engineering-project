@@ -26,34 +26,49 @@ BEGIN
             );
             
 
-            INSERT INTO Silver_OnlineRetail(
-                    InvoiceNo,
-                    StockCode,
-                    Description,
-                    Quantity,
-                    InvoiceDate,
-                    UnitPrice,
-                    CustomerID,
-                    Country
-            )
+            WITH RankedData AS (
             SELECT
-                InvoiceNO,
+                InvoiceNo,
                 StockCode,
                 Description,
                 TRY_CAST(Quantity AS INT) AS Quantity,
                 TRY_CAST(InvoiceDate AS DATETIME) AS InvoiceDate,
                 TRY_CAST(UnitPrice AS DECIMAL(10,2)) AS UnitPrice,
                 CustomerID,
-                Country
-            FROM Bronze_OnlineRetail;
+                Country,
+                ROW_NUMBER() OVER (
+                    PARTITION BY InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country 
+                    ORDER BY (SELECT NULL)
+                ) AS RowNum
+            FROM Bronze_OnlineRetail
+        )
+        INSERT INTO Silver_OnlineRetail (
+            InvoiceNo,
+            StockCode,
+            Description,
+            Quantity,
+            InvoiceDate,
+            UnitPrice,
+            CustomerID,
+            Country
+        )
+        SELECT
+            InvoiceNo,
+            StockCode,
+            Description,
+            Quantity,
+            InvoiceDate,
+            UnitPrice,
+            CustomerID,
+            Country
+        FROM RankedData
+        WHERE RowNum = 1;
             
             COMMIT
         END TRY
         BEGIN CATCH
             ROLLBACK TRANSACTION
 
-            PRINT 'Error in Loading Silver Layer'
-            PRINT ERROR_MESSAGE();
         END CATCH
 END
 GO

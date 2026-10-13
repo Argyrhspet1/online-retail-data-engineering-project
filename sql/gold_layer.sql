@@ -86,14 +86,11 @@ BEGIN
 			WHERE s.CustomerID IS NOT NULL AND s.StockCode IS NOT NULL;
 
 			COMMIT TRANSACTION;
-			PRINT 'Gold Layer loaded!'
 		
 		END TRY
 		BEGIN CATCH
 			ROLLBACK TRANSACTION
 
-			PRINT 'Something went wrong!'
-			PRINT ERROR_MESSAGE()
 		END CATCH
 END
 GO

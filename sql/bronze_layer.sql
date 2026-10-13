@@ -41,15 +41,13 @@ BEGIN
 
         COMMIT TRANSACTION;
 
-        PRINT 'Bronze Layer Loaded successfully!';
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
         
-        PRINT 'ERROR during loading Bronze Layer!';
-        PRINT ERROR_MESSAGE();
     END CATCH
 END;
 GO
+
 
 EXEC sp_LoadBronzeLayer;
